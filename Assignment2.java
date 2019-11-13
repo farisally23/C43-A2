@@ -8,13 +8,15 @@ public class Assignment2 {
 
     public static void main(String[] args) throws Exception {
         Assignment2 a2 = new Assignment2();
-        System.out.println(a2.connection);
-        System.out.println(a2.connectDB("jdbc:postgresql://localhost:5432/xucharle", "xucharle", "password"));
-        System.out.println(a2.connection);
-        System.out.println(a2.connection.isClosed());
-        System.out.println(a2.disconnectDB());
-        System.out.println(a2.connection);
-        System.out.println(a2.connection.isClosed());
+        System.out.println("Connected to Database: " + a2.connectDB("jdbc:postgresql://localhost:5432/xucharle", "xucharle", "password"));
+        System.out.println("Connection Open: " + !a2.connection.isClosed());
+        
+        System.out.println("Insert Player: " + a2.insertPlayer(8, "Charles Xu", 8, 3));
+        System.out.println("Insert Duplicate Player: " + a2.insertPlayer(8, "Charles Xu", 8, 3));
+        System.out.println("Insert Invalid Country: " + a2.insertPlayer(8, "Alex Smith", 8, 10));
+        
+        System.out.println("Closing Database: " + a2.disconnectDB());
+        System.out.println("Connection Open: " + !a2.connection.isClosed());
     }
 
     // A connection to the database
@@ -195,21 +197,28 @@ public class Assignment2 {
         }
     }
 
-    public boolean deleteMatcBetween(int p1id, int p2id) {
-        // try {
-        //
-        // return true;
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // return false;
-        // } finally {
-        // try {
-        //
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // }
-        // }
-        return false;
+    public boolean deleteMatchBetween(int p1id, int p2id) {
+        try {
+            ps = connection.prepareStatement("DELETE FROM event WHERE (winid=? AND lossid=?) OR (winid=? AND lossid=?);");
+
+            ps.setInt(1, p1id);
+            ps.setInt(2, p2id);
+            ps.setInt(3, p2id);
+            ps.setInt(4, p1id);
+
+            int count = ps.executeUpdate();
+            return count > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                ps.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
     }
 
     public String listPlayerRanking() {
@@ -243,11 +252,7 @@ public class Assignment2 {
 
     public int findTriCircle() {
         try {
-            ps = connection.prepareStatement(
-                    "SELECT COUNT(*) "
-                  + "FROM event e1, event e2, event e3 "
-                  + "WHERE e1.winid < e2.winid AND e2.winid < e3.winid "
-                  + "AND e1.winid = e3.lossid AND e2.winid = e1.lossid AND e3.winid = e2.lossid;");
+            ps = connection.prepareStatement("SELECT COUNT(*) FROM event e1, event e2, event e3 WHERE e1.winid < e2.winid AND e2.winid < e3.winid AND e1.winid = e3.lossid AND e2.winid = e1.lossid AND e3.winid = e2.lossid;");
             rs = ps.executeQuery();
             return rs.next() ? rs.getInt(1) : 0;
         } catch (Exception e) {
@@ -265,11 +270,29 @@ public class Assignment2 {
     }
 
     public boolean updateDB() {
-        /*
-         * DROP TABLE IF EXISTS championPlayers CASCADE;
-         * 
-         * CREATE TABLE player( pid INTEGER PRIMARY KEY, pname VARCHAR NOT NULL, nchampions INTEGER NOT NULL );
-         */
-        return false;
+        try {
+            ps = connection.prepareStatement("DROP TABLE IF EXISTS championPlayers CASCADE;");
+            ps.execute();
+            ps.close();
+
+            ps = connection.prepareStatement("CREATE TABLE championPlayers (pid INTEGER, pname VARCHAR NOT NULL, nchampions INTEGER);");
+            ps.execute();
+            ps.close();
+
+            ps = connection.prepareStatement("INSERT INTO championPlayers (SELECT p.pid, p.pname, COUNT(c.tid) AS nchampions FROM player p JOIN champion c ON c.pid = p.pid GROUP BY p.pid);");
+            ps.execute();
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                ps.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
     }
 }
