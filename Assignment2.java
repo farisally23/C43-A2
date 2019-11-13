@@ -2,10 +2,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Assignment2 {
+
+    public static void main(String[] args) throws Exception {
+        Assignment2 a2 = new Assignment2();
+        System.out.println(a2.connection);
+        System.out.println(a2.connectDB("jdbc:postgresql://localhost:5432/xucharle", "xucharle", "password"));
+        System.out.println(a2.connection);
+        System.out.println(a2.connection.isClosed());
+        System.out.println(a2.disconnectDB());
+        System.out.println(a2.connection);
+        System.out.println(a2.connection.isClosed());
+    }
 
     // A connection to the database
     Connection connection;
@@ -24,7 +34,7 @@ public class Assignment2 {
     // CONSTRUCTOR
     Assignment2() {
         try {
-            Class.forName("com.mysql.jdbc.Driver"); // <= "com.mysql.cj.jdbc.Driver" ?
+            Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -33,9 +43,15 @@ public class Assignment2 {
     // Using the input parameters, establish a connection to be used for this session. Returns true if connection is sucessful
     public boolean connectDB(String URL, String username, String password) {
         try {
+            if (connection != null && !connection.isClosed()) {
+                if (!disconnectDB()) {
+                    return false;
+                }
+            }
+
             connection = DriverManager.getConnection(URL, username, password);
             return true;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -44,9 +60,13 @@ public class Assignment2 {
     // Closes the connection. Returns true if closure was sucessful
     public boolean disconnectDB() {
         try {
-            connection.close();
-            return true;
-        } catch (SQLException e) {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -63,13 +83,13 @@ public class Assignment2 {
 
             int count = ps.executeUpdate();
             return count == 1;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         } finally {
             try {
                 ps.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -84,14 +104,14 @@ public class Assignment2 {
             rs = ps.executeQuery();
 
             return rs.next() ? rs.getInt(1) : 0;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return 0;
         } finally {
             try {
                 ps.close();
                 rs.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -123,7 +143,7 @@ public class Assignment2 {
             } else {
                 return "";
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return "";
         } finally {
@@ -132,7 +152,7 @@ public class Assignment2 {
                 rs.close();
                 psB.close();
                 rsB.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -162,41 +182,86 @@ public class Assignment2 {
                 int update = ps.executeUpdate();
                 return update >= 1;
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         } finally {
             try {
                 ps.close();
                 psB.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
     public boolean deleteMatcBetween(int p1id, int p2id) {
-        try {
+        // try {
+        //
+        // return true;
+        // } catch (SQLException e) {
+        // e.printStackTrace();
+        // return false;
+        // } finally {
+        // try {
+        //
+        // } catch (SQLException e) {
+        // e.printStackTrace();
+        // }
+        // }
+        return false;
+    }
 
-            return true;
-        } catch (SQLException e) {
+    public String listPlayerRanking() {
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            ps = connection.prepareStatement("SELECT pname, globalrank FROM player ORDER BY globalrank DESC;");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                if (sb.length() > 0)
+                    sb.append("\n");
+                String player = String.format("%s:%d", rs.getString("pname"), rs.getInt("globalrank"));
+                sb.append(player);
+            }
+
+            return sb.toString();
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return "";
         } finally {
             try {
-
-            } catch (SQLException e) {
+                ps.close();
+                rs.close();
+            } catch (Exception e) {
                 e.printStackTrace();
+                return "";
             }
         }
     }
 
-    public String listPlayerRanking() {
-        return "";
-    }
-
     public int findTriCircle() {
-        return 0;
+        try {
+            ps = connection.prepareStatement(
+                    "SELECT COUNT(*) "
+                  + "FROM event e1, event e2, event e3 "
+                  + "WHERE e1.winid < e2.winid AND e2.winid < e3.winid "
+                  + "AND e1.winid = e3.lossid AND e2.winid = e1.lossid AND e3.winid = e2.lossid;");
+            rs = ps.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            try {
+                ps.close();
+                rs.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return 0;
+            }
+        }
     }
 
     public boolean updateDB() {
