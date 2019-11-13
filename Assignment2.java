@@ -54,7 +54,6 @@ public class Assignment2 {
             connection = DriverManager.getConnection(URL, username, password);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -69,7 +68,6 @@ public class Assignment2 {
                 return false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -86,13 +84,12 @@ public class Assignment2 {
             int count = ps.executeUpdate();
             return count == 1;
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         } finally {
             try {
                 ps.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                return false;
             }
         }
     }
@@ -107,14 +104,13 @@ public class Assignment2 {
 
             return rs.next() ? rs.getInt(1) : 0;
         } catch (Exception e) {
-            e.printStackTrace();
             return 0;
         } finally {
             try {
                 ps.close();
                 rs.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                return 0;
             }
         }
     }
@@ -146,7 +142,6 @@ public class Assignment2 {
                 return "";
             }
         } catch (Exception e) {
-            e.printStackTrace();
             return "";
         } finally {
             try {
@@ -155,7 +150,7 @@ public class Assignment2 {
                 psB.close();
                 rsB.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                return "";
             }
         }
     }
@@ -185,14 +180,13 @@ public class Assignment2 {
                 return update >= 1;
             }
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         } finally {
             try {
                 ps.close();
                 psB.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                return false;
             }
         }
     }
@@ -209,13 +203,11 @@ public class Assignment2 {
             int count = ps.executeUpdate();
             return count > 0;
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         } finally {
             try {
                 ps.close();
             } catch (Exception e) {
-                e.printStackTrace();
                 return false;
             }
         }
@@ -237,14 +229,12 @@ public class Assignment2 {
 
             return sb.toString();
         } catch (Exception e) {
-            e.printStackTrace();
             return "";
         } finally {
             try {
                 ps.close();
                 rs.close();
             } catch (Exception e) {
-                e.printStackTrace();
                 return "";
             }
         }
@@ -256,14 +246,12 @@ public class Assignment2 {
             rs = ps.executeQuery();
             return rs.next() ? rs.getInt(1) : 0;
         } catch (Exception e) {
-            e.printStackTrace();
             return 0;
         } finally {
             try {
                 ps.close();
                 rs.close();
             } catch (Exception e) {
-                e.printStackTrace();
                 return 0;
             }
         }
@@ -284,13 +272,11 @@ public class Assignment2 {
 
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         } finally {
             try {
                 ps.close();
             } catch (Exception e) {
-                e.printStackTrace();
                 return false;
             }
         }
