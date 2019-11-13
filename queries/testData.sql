@@ -1,4 +1,4 @@
-﻿INSERT INTO a2.country VALUES (1, 'Canada');
+INSERT INTO a2.country VALUES (1, 'Canada');
 INSERT INTO a2.country VALUES (2, 'United States');
 INSERT INTO a2.country VALUES (3, 'Brazil');
 INSERT INTO a2.country VALUES (4, 'Japan');
@@ -97,3 +97,10 @@ INSERT INTO a2.event VALUES (14, 2014, 2, 4, 5, 200);
 INSERT INTO a2.event VALUES (15, 2014, 2, 4, 6, 200);
 INSERT INTO a2.event VALUES (16, 2011, 2, 4, 6, 100);
 INSERT INTO a2.event VALUES (17, 2010, 1, 1, 7, 200);
+
+INSERT INTO a2.event VALUES (18, 2014, 2, 1, 2, 200);
+INSERT INTO a2.event VALUES (19, 2011, 2, 2, 3, 100);
+INSERT INTO a2.event VALUES (20, 2010, 1, 3, 1, 200);
+
+INSERT INTO a2.event VALUES (21, 2014, 2, 2, 3, 200);
+INSERT INTO a2.event VALUES (22, 2010, 1, 4, 2, 200);
