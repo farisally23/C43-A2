@@ -139,11 +139,56 @@ public class Assignment2 {
     }
 
     public boolean chgRecord(int pid, int year, int wins, int losses) {
-        return false;
+        try {
+            ps = connection.prepareStatement("UPDATE record SET year=?, wins=?, losses=? WHERE pid=?;");
+
+            ps.setInt(1, year);
+            ps.setInt(2, wins);
+            ps.setInt(3, losses);
+            ps.setInt(4, pid);
+
+            int count = ps.executeUpdate();
+
+            if (count >= 1) {
+                return true;
+            } else {
+                psB = connection.prepareStatement("INSERT INTO record VALUES (?, ?, ?, ?);");
+
+                psB.setInt(1, pid);
+                psB.setInt(2, year);
+                psB.setInt(3, wins);
+                psB.setInt(4, losses);
+
+                int update = ps.executeUpdate();
+                return update >= 1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                ps.close();
+                psB.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean deleteMatcBetween(int p1id, int p2id) {
-        return false;
+        try {
+
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public String listPlayerRanking() {
@@ -155,15 +200,11 @@ public class Assignment2 {
     }
 
     public boolean updateDB() {
-        /* 
+        /*
          * DROP TABLE IF EXISTS championPlayers CASCADE;
          * 
-         * CREATE TABLE player(
-               pid         INTEGER     PRIMARY KEY,
-               pname       VARCHAR     NOT NULL,
-               nchampions  INTEGER     NOT NULL
-           );
-        */ 
+         * CREATE TABLE player( pid INTEGER PRIMARY KEY, pname VARCHAR NOT NULL, nchampions INTEGER NOT NULL );
+         */
         return false;
     }
 }
